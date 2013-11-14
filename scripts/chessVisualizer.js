@@ -6,6 +6,8 @@ var Chess = {};
 var models;
 var chess;
 
+var centerObject;
+
 /**
  * Initializes the board.
  */
@@ -15,7 +17,7 @@ Chess.init = function () {
     initCamera();
     initScene();
     initLighting();
-    
+
     Control.animate();
 };
 
@@ -23,17 +25,16 @@ function initLighting() {
     var ambient = new THREE.AmbientLight( 0x101010 );
     _scene.add(ambient);
 
-    addPointLight(0, 100, 0);
-    addPointLight(-200, 20, -200);
-    addPointLight(-200, 20,  200);
-    addPointLight( 200, 20, -200);
-    addPointLight( 200, 20,  200);
-}
+    //_scene.add(Utils.createPointLight(0, 100, 0));
+    var distanceFactor = 300;
+    var height = 100;
 
-function addPointLight(x, y, z) {
-    var pointLight = new THREE.PointLight(0xFFFFFF);
-    pointLight.position.set(x, y, z);
-    _scene.add(pointLight);
+    for (var i = -1; i < 2; i += 2) {
+        for (var j = -1; j < 2; j += 2) {
+            console.log(i * distanceFactor, height, j * distanceFactor);
+            _scene.add(Utils.createPointLight(i * distanceFactor, height, j * distanceFactor));
+        }
+    }
 }
 
 function initCamera() {
@@ -50,13 +51,30 @@ function initScene() {
 
     models.board.scale.set(20, 20, 20);
     models.board.position.set(-140, -20, 140);
+    _scene.add(centerObject);
     chess.add(models.board);
     _scene.add(chess);
 
-
-    var cube = new THREE.Mesh(new THREE.CubeGeometry(40, 1, 1), new THREE.MeshNormalMaterial());
-    _scene.add(cube);
+    var texture = THREE.ImageUtils.loadTexture('resources/textures/wood-1.png');
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+    texture.repeat.set(4, 4);
+    texture.anisotropy = _renderer.getMaxAnisotropy();
+    var material = new THREE.MeshPhongMaterial({ 
+        map: texture,
+        // light
+        specular: '#ffffff',
+        // intermediate
+        color: '#555555',
+        // dark
+        emissive: '#ffffff',
+        shininess: 100 
+    });
+    var base = new THREE.Mesh(new THREE.CubeGeometry(20, 0.2, 20), material);
+    base.position.set(7, -0.1, -7);
+    models.board.add(base);
 }
+
+
 
 // Make available globally
 window.Chess = Chess;
