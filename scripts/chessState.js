@@ -61,16 +61,9 @@ ChessState.prototype.move = function (move) {
     this.board[destRank][destFile] = piece;
 };
 
-var PIECES = ChessState.PIECES = {
+var PIECES = ChessState.PIECES = Utils.bidirectional({
     // Empty space
     na: 0,
-    // General
-    P: 1,
-    R: 2,
-    N: 3,
-    Q: 4,
-    K: 5,
-    B: 6,
     // White
     wP: 1,
     wR: 2,
@@ -85,6 +78,28 @@ var PIECES = ChessState.PIECES = {
     bQ: 12,
     bK: 13,
     bB: 14
+});
+
+var FILES = ChessState.FILES = {
+    'A': 0,
+    'B': 1,
+    'C': 2,
+    'D': 3,
+    'E': 4,
+    'F': 5,
+    'G': 6,
+    'H': 7
+};
+
+var RANKS = ChessState.RANKS = {
+    1: 0,
+    2: 1,
+    3: 2,
+    4: 3,
+    5: 4,
+    6: 5,
+    7: 6,
+    8: 7
 };
 
 // Make available globally

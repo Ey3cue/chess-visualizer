@@ -1,6 +1,4 @@
-
-<!-- saved from url=(0064)http://andrewwbanner.com/chess/pawn/objects/lowploycountpawn.obj -->
-<html __fvdsurfcanyoninserted="1"><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-2"><style type="text/css"></style><script type="text/javascript" src="chrome-extension://bfbmjmiodbnnpllbbbfblcplfjjepjdn/js/injected.js"></script><style id="bitmark_stylesheet" type="text/css"></style></head><body style=""><pre style="word-wrap: break-word; white-space: pre-wrap;"># Blender v2.68 (sub 0) OBJ File: 'lowploycountpawn.blend'
+# Blender v2.68 (sub 0) OBJ File: 'lowploycountpawn.blend'
 # www.blender.org
 mtllib lowploycountpawn.mtl
 o Cylinder
@@ -7722,4 +7720,3 @@ f 996 2914 3848 2820
 f 996 2820 3847 2924
 f 996 2924 3380 1934
 f 996 1934 3381 2914
-</pre></body></html>

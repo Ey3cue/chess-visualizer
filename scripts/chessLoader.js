@@ -27,18 +27,18 @@ ChessLoader.add = function (key, obj) {
 };
 
 ChessLoader.addDefaults = function () {
-	// ChessLoader.add('wP', '', '');
-    // ChessLoader.add('wR', '', '');
-    // ChessLoader.add('wN', '', '');
-    // ChessLoader.add('wQ', '', '');
-    // ChessLoader.add('wK', '', '');
-    // ChessLoader.add('wB', '', '');
-    // ChessLoader.add('bP', '', '');
-    // ChessLoader.add('bR', '', '');
-    // ChessLoader.add('bN', '', '');
-    // ChessLoader.add('bQ', '', '');
-    // ChessLoader.add('bK', '', '');
-    // ChessLoader.add('bB', '', '');
+	ChessLoader.add('wP', 'lowploycountpawn');
+    ChessLoader.add('wR', 'rookwh');
+    ChessLoader.add('wN', 'knightwh');
+    ChessLoader.add('wQ', 'queenwh');
+    ChessLoader.add('wK', 'kingwh');
+    ChessLoader.add('wB', 'bishop2white');
+    ChessLoader.add('bP', 'lowploycountpawnblack');
+    ChessLoader.add('bR', 'rookbk');
+    ChessLoader.add('bN', 'knightbk');
+    ChessLoader.add('bQ', 'queenbk');
+    ChessLoader.add('bK', 'kingbk');
+    ChessLoader.add('bB', 'bishop2black');
 
     ChessLoader.add('board', 'board3');
 };
@@ -63,7 +63,7 @@ ChessLoader.loadAll = function (callback) {
 };
 
 ChessLoader.get = function (key) {
-	return loaded[key];
+	return loaded[key] ? loaded[key].clone() : null;
 };
 
 function Load(key, obj) {

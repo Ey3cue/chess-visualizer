@@ -5,14 +5,31 @@ var Chess = {};
 
 var models;
 var chess;
+var board;
 
 var centerObject;
+
+var PIECE_X_FACTOR = 2;
+var PIECE_Z_FACTOR = -2;
+var PIECE_Y = 0.2;
+var PIECE_SCALE_FACTOR = 0.7;
+
+var BOARD_SCALE_FACTOR = 20;
 
 /**
  * Initializes the board.
  */
 Chess.init = function () {
-    models = ChessLoader.objects;
+    models = {
+        8: { A: null, B: null, C: null, D: null, E: null, F: null, G: null, H: null },
+        7: { A: null, B: null, C: null, D: null, E: null, F: null, G: null, H: null },
+        6: { A: null, B: null, C: null, D: null, E: null, F: null, G: null, H: null },
+        5: { A: null, B: null, C: null, D: null, E: null, F: null, G: null, H: null },
+        4: { A: null, B: null, C: null, D: null, E: null, F: null, G: null, H: null },
+        3: { A: null, B: null, C: null, D: null, E: null, F: null, G: null, H: null },
+        2: { A: null, B: null, C: null, D: null, E: null, F: null, G: null, H: null },
+        1: { A: null, B: null, C: null, D: null, E: null, F: null, G: null, H: null }
+    };
 
     initCamera();
     initScene();
@@ -31,7 +48,6 @@ function initLighting() {
 
     for (var i = -1; i < 2; i += 2) {
         for (var j = -1; j < 2; j += 2) {
-            console.log(i * distanceFactor, height, j * distanceFactor);
             _scene.add(Utils.createPointLight(i * distanceFactor, height, j * distanceFactor));
         }
     }
@@ -49,32 +65,79 @@ function initScene() {
 
     chess = new THREE.Object3D();
 
-    models.board.scale.set(20, 20, 20);
-    models.board.position.set(-140, -20, 140);
-    _scene.add(centerObject);
-    chess.add(models.board);
+    board = ChessLoader.get('board');
+    board.scale.set(BOARD_SCALE_FACTOR, BOARD_SCALE_FACTOR, BOARD_SCALE_FACTOR);
+    board.position.set(-7 * BOARD_SCALE_FACTOR, -20, 7 * BOARD_SCALE_FACTOR);
+    chess.add(board);
     _scene.add(chess);
 
     var texture = THREE.ImageUtils.loadTexture('resources/textures/wood-1.png');
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
     texture.repeat.set(4, 4);
     texture.anisotropy = _renderer.getMaxAnisotropy();
-    var material = new THREE.MeshPhongMaterial({ 
+    var material = new THREE.MeshPhongMaterial({
         map: texture,
-        // light
-        specular: '#ffffff',
-        // intermediate
-        color: '#555555',
-        // dark
-        emissive: '#ffffff',
-        shininess: 100 
+        specular: '#FFFFFF',
+        color:'#555555',
+        emissive:'#FFFFFF',
+        shininess: 100
     });
-    var base = new THREE.Mesh(new THREE.CubeGeometry(20, 0.2, 20), material);
+    var base = new THREE.Mesh(new THREE.CubeGeometry(19, 0.35, 19), material);
     base.position.set(7, -0.1, -7);
-    models.board.add(base);
+    board.add(base);
+
+    Chess.setSceneWithState(_state);
 }
 
+Chess.setSceneWithState = function (state) {
+    for (var rank in models) {
+        for (var file in models[rank]) {
+            var currentModel = models[rank][file];
+            if (currentModel) {
+                // Remove any existing pieces
+                board.remove(currentModel);
+            }
 
+            // Place new piece if it exists in the state
+            var pieceStr = ChessState.PIECES[state.board[rank][file]];
+            var model = ChessLoader.get(pieceStr);
+            if (model) {
+                models[rank][file] = model;
+                model.position.set(boardX(file), PIECE_Y, boardZ(rank));
+                model.scale.set(PIECE_SCALE_FACTOR, PIECE_SCALE_FACTOR, PIECE_SCALE_FACTOR);
+                model.rotation.y = PIECE_ROTATIONS[pieceStr];
+                board.add(model);
+            } else if (pieceStr !== 'na') {
+                console.warn('Could not get model for: ' + ChessState.PIECES[state.board[rank][file]]);
+            }
+        }
+    }
+};
+
+function boardX(file) {
+    return ChessState.FILES[file] * PIECE_X_FACTOR;
+}
+
+function boardZ(rank) {
+    return ChessState.RANKS[rank] * PIECE_Z_FACTOR;
+}
+
+var PIECE_ROTATIONS = {
+    // White
+    wP: 0,
+    wR: 0,
+    wN: Utils.toRads(180),
+    wQ: 0,
+    wK: Utils.toRads(90),
+    wB: Utils.toRads(90),
+    // Black
+    bP: 0,
+    bR: 0,
+    bN: 0,
+    bQ: 0,
+    bK: Utils.toRads(90),
+    bB: Utils.toRads(-90)
+};
 
 // Make available globally
 window.Chess = Chess;
