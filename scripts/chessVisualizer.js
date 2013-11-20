@@ -67,16 +67,8 @@ function initScene() {
 
     board = ChessLoader.get('board');
     board.scale.set(BOARD_SCALE_FACTOR, BOARD_SCALE_FACTOR, BOARD_SCALE_FACTOR);
-    board.position.set(7 * BOARD_SCALE_FACTOR, -20, 7 * BOARD_SCALE_FACTOR);
-    board.rotation.y = Utils.toRads(90);
+    board.position.set(-7 * BOARD_SCALE_FACTOR, -20, 7 * BOARD_SCALE_FACTOR);
     chess.add(board);
-    // Need to add a container in between board and pieces because the way the board is positioned
-    //   it needs to be rotated 90 degrees for the tiles to be correct.
-    var boardPlacer = new THREE.Object3D();
-    boardPlacer.position.z = -14;
-    boardPlacer.rotation.y = Utils.toRads(-90);
-    board.add(boardPlacer);
-    board = boardPlacer;
     _scene.add(chess);
 
     // Wood texture outline
