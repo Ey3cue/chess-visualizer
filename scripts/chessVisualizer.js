@@ -92,43 +92,55 @@ Chess.setSceneWithState = function () {
                 // Remove any existing pieces
                 board.remove(currentModel);
             }
-            console.log(board.rotation);
             // Place new piece if it exists in the state
             var pieceStr = Chess.PIECES[_state.board[rank][file]];
             var model = ChessLoader.get(pieceStr);
             if (model) {
                 models[rank][file] = model;
                 model.position = Utils.cellToVec3(rank, file);
-                model.scale = Utils.vec3(Chess.PIECE_SCALE_FACTOR[pieceStr]);
+                model.scale = Utils.vec3(0.01);
                 model.rotation.y = Chess.PIECE_ROTATIONS[pieceStr];
                 board.add(model);
+                Chess.addTween({
+                    model: model,
+                    scale: Utils.vec3(Chess.PIECE_SCALE_FACTOR[pieceStr])
+                });
             } else if (pieceStr !== 'na') {
                 console.warn('Could not get model for: ' + Chess.PIECES[_state.board[rank][file]]);
             }
         }
     }
+    Chess.startTweens();
 };
 
 Chess.move = function (move) {
     move = move.toUpperCase();
     var moveDef = _state.move(move);
-
     var sourceModel = models[move[2]][move[1]];
     var destModel = models[move[4]][move[3]];
-    
-    var target;
+    var makeMove = function () { models[move[4]][move[3]] = models[move[2]][move[1]]; };
 
     switch (moveDef.constructor) {
     case MoveDefinition.EnPassant:
-
+        // TODO Tween en passant
         break;
     case MoveDefinition.Castle:
         // TODO Tween rook and king
         break;
     case MoveDefinition.Capture:
-        // TODO Tween capture
+        Chess.addTween({
+            model: destModel,
+            scale: Utils.xyz(0),
+            callback: function () { board.remove(destModel); }
+        });
+        // Fall through
     case MoveDefinition.Normal:
-        Chess.addTween(sourceModel, Utils.cellToXyz(moveDef.end));
+        Chess.addTween({
+            model: sourceModel,
+            position: Utils.cellToXyz(moveDef.end),
+            callback: makeMove
+        });
+        Chess.startTweens();
         break;
     default:
         break;

@@ -4,18 +4,28 @@
 var tweensListQueue = [];
 var currentTweenList = null;
 
-Chess.addTween = function (model, position, rotation, scale) {
-    startTween(model,
-               Utils.vec3ToXyz(model.position),
-               Utils.vec3ToXyz(model.rotation),
-               Utils.vec3ToXyz(model.scale),
-               position || { x: model.position.x, y: model.position.y, z: model.position.z },
-               rotation || { x: model.rotation.x, y: model.rotation.y, z: model.rotation.z },
-               scale    || { x: model.scale.x,    y: model.scale.y + 1,    z: model.scale.z });
+var tweenSetupList = [];
+
+Chess.addTween = function (options) {
+    addTween(
+        options.model,
+        Utils.vec3ToXyz(options.model.position),
+        Utils.vec3ToXyz(options.model.rotation),
+        Utils.vec3ToXyz(options.model.scale),
+        options.position || { x: options.model.position.x, y: options.model.position.y, z: options.model.position.z },
+        options.rotation || { x: options.model.rotation.x, y: options.model.rotation.y, z: options.model.rotation.z },
+        options.scale    || { x: options.model.scale.x,    y: options.model.scale.y,    z: options.model.scale.z    },
+        options.callback || function () {}
+    );
 };
 
-function startTween(model, startPos, startRot, startScale, endPos, endRot, endScale) {
-    tweensListQueue.push([
+Chess.startTweens = function () {
+    tweensListQueue.push(tweenSetupList);
+    tweenSetupList = [];
+};
+
+function addTween(model, startPos, startRot, startScale, endPos, endRot, endScale, callback) {
+    tweenSetupList.push(
         new TWEEN.Tween(startPos)
                 .to(endPos, Chess.MOVE_DURATION)
                 .easing(Chess.DEFAULT_EASING)
@@ -28,8 +38,11 @@ function startTween(model, startPos, startRot, startScale, endPos, endRot, endSc
                 .to(endScale, Chess.MOVE_DURATION)
                 .easing(Chess.DEFAULT_EASING)
                 .onUpdate(function () { model.scale.set(startScale.x, startScale.y, startScale.z); })
-            .onComplete(function () { currentTweenList = null; })
-    ]);
+            .onComplete(function () {
+                currentTweenList = null;
+                callback();
+            })
+    );
 }
 
 Chess.updateTweens = function () {
