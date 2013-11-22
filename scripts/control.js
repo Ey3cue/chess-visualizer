@@ -10,6 +10,9 @@ var _state;
 
 var Control = {};
 
+var stats;
+var gui;
+
 /**
  * Performs various initialization steps for the application.
  */
@@ -23,6 +26,20 @@ Control.init = function () {
     ChessLoader.init();
     ChessLoader.addDefaults();
     ChessLoader.loadAll(Chess.init);
+
+    Control.initStats();
+    Control.initGui();
+};
+
+Control.initStats = function () {
+    stats = new Stats();
+
+    // Align top-left
+    stats.domElement.style.position = 'absolute';
+    stats.domElement.style.left = '0px';
+    stats.domElement.style.top = '0px';
+
+    document.body.appendChild(stats.domElement);
 };
 
 Control.resize = function () {
@@ -36,11 +53,19 @@ window.onload = Control.init;
 window.onresize = Control.resize;
 
 Control.animate = function () {
+    stats.begin();
+
     requestAnimationFrame(Control.animate);
 
     Chess.update();
 
     _renderer.render(_scene, _camera);
+
+    stats.end();
+};
+
+Control.initGui = function () {
+    gui = new dat.GUI();
 };
 
 
