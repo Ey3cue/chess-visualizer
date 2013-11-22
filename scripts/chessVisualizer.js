@@ -51,7 +51,7 @@ function initCamera() {
     _camera.position.set(0, 200, 350);
     _camera.lookAt(_scene.position);
 
-    new THREE.OrbitControls(_camera);
+    new THREE.OrbitControls(_camera, $('#chessVisualizer')[0]);
 }
 
 function initScene() {

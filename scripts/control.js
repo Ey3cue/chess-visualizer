@@ -4,6 +4,8 @@ var _renderer;
 var _camera;
 var _scene;
 
+var _gui;
+
 var _state;
 
 (function () {
@@ -11,7 +13,6 @@ var _state;
 var Control = {};
 
 var stats;
-var gui;
 
 /**
  * Performs various initialization steps for the application.
@@ -22,13 +23,14 @@ Control.init = function () {
     $('#chessVisualizer')[0].appendChild(_renderer.domElement);
 
     _state = new ChessState();
+    _gui = new dat.GUI();
 
     ChessLoader.init();
     ChessLoader.addDefaults();
     ChessLoader.loadAll(Chess.init);
 
     Control.initStats();
-    Control.initGui();
+    ControlGame.init();
 };
 
 Control.initStats = function () {
@@ -63,11 +65,6 @@ Control.animate = function () {
 
     stats.end();
 };
-
-Control.initGui = function () {
-    gui = new dat.GUI();
-};
-
 
 // Make available globally
 window.Control = Control;
