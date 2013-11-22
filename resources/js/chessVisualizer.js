@@ -28,6 +28,8 @@ Chess.init = function () {
     initCamera();
     initLighting();
 
+    Alert.warn('PLEASE ALLOW ALL ANIMATIONS TO COMPLETE WHEN INTERACTING WITH GUI.');
+
     Control.animate();
 };
 
@@ -81,36 +83,60 @@ function initScene() {
     base.position.set(7, -0.5, -7);
     board.add(base);
 
-    Chess.setSceneWithState();
+    Chess.setSceneWithState(true);
 }
 
-Chess.setSceneWithState = function () {
-    for (var rank in models) {
-        for (var file in models[rank]) {
-            var currentModel = models[rank][file];
-            if (currentModel) {
-                // Remove any existing pieces
-                board.remove(currentModel);
+Chess.setSceneWithState = function (isFirstSet) {
+    var rank, file;
+    console.log(Chess.PIECES[_previousState.board[2]['E']], Chess.PIECES[_state.board[2]['E']]);
+    if (!isFirstSet) {
+        // Closure to save the model passed in to remove in a later callback
+        function modelRemoval(model) {
+            return function () { board.remove(model); };
+        }
+
+        for (rank in models) {
+            for (file in models[rank]) {
+                var currentModel = models[rank][file];
+                if (currentModel && _previousState.board[rank][file] !== _state.board[rank][file]) {
+                    // Remove any existing pieces
+                    Chess.addTween({
+                        model: currentModel,
+                        scale: Utils.xyz(0),
+                        // Remove model once tween is finished
+                        callback: modelRemoval(currentModel)
+                    });
+                }
             }
-            // Place new piece if it exists in the state
-            var pieceStr = Chess.PIECES[_state.board[rank][file]];
-            var model = ChessLoader.get(pieceStr);
-            if (model) {
-                models[rank][file] = model;
-                model.position = Utils.cellToVec3(rank, file);
-                model.scale = Utils.vec3(0.01);
-                model.rotation.y = Chess.PIECE_ROTATIONS[pieceStr];
-                board.add(model);
-                Chess.addTween({
-                    model: model,
-                    scale: Utils.vec3(Chess.PIECE_SCALE_FACTOR[pieceStr])
-                });
-            } else if (pieceStr !== 'na') {
-                console.warn('Could not get model for: ' + Chess.PIECES[_state.board[rank][file]]);
+        }
+        Chess.startTweens();
+    }
+
+    for (rank in models) {
+        for (file in models[rank]) {
+            if (_previousState.board[rank][file] !== _state.board[rank][file]) {
+                // Place new piece if it exists in the state
+                var pieceStr = Chess.PIECES[_state.board[rank][file]];
+                var model = ChessLoader.get(pieceStr);
+                if (model) {
+                    models[rank][file] = model;
+                    model.position = Utils.cellToVec3(rank, file);
+                    model.scale = Utils.vec3(0.01);
+                    model.rotation.y = Chess.PIECE_ROTATIONS[pieceStr];
+                    board.add(model);
+                    Chess.addTween({
+                        model: model,
+                        scale: Utils.vec3(Chess.PIECE_SCALE_FACTOR[pieceStr])
+                    });
+                } else if (pieceStr !== 'na') {
+                    console.warn('Could not get model for: ' + Chess.PIECES[_state.board[rank][file]]);
+                }
             }
         }
     }
     Chess.startTweens();
+
+    _previousState = _state.clone();
 };
 
 Chess.move = function (move) {

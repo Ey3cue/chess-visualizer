@@ -44,6 +44,8 @@ ChessLoader.addDefaults = function () {
 };
 
 ChessLoader.loadAll = function (callback) {
+    Alert.loading();
+    
     for (var i in loads) {
         (function (load) {
             loader.load(MODELS_PATH + load.obj + '.obj', MODELS_PATH + load.obj + '.mtl', function (object) {
@@ -56,6 +58,7 @@ ChessLoader.loadAll = function (callback) {
     var checkInterval = setInterval(function () {
         if (total === totalLoaded) {
             clearInterval(checkInterval);
+            Alert.done();
             callback();
         }
     }, 100);

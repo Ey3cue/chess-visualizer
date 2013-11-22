@@ -3,7 +3,7 @@
 
 // Rendering-specific
 
-Chess.MOVE_DURATION = 1000;
+Chess.MOVE_DURATION = 500;
 Chess.DEFAULT_EASING = TWEEN.Easing.Quadratic.InOut;
 
 Chess.BOARD_SCALE_FACTOR = 20;

@@ -11,13 +11,13 @@
  * standard 2D array of board[rank][file].
  */
 function ChessState() {
-	this.initState();
+	this.init();
 }
 
 /**
  * Initializes the state.
  */
-ChessState.prototype.initState = function () {
+ChessState.prototype.init = function () {
     /*
         Starting State:
            A  B  C  D  E  F  G  H
@@ -53,11 +53,37 @@ ChessState.prototype.initState = function () {
     };
 };
 
+ChessState.prototype.reset = function () {
+    _previousState = this.clone();
+    this.init();
+};
+
+ChessState.prototype.clone = function () {
+    var state = new ChessState();
+    for (var rank in state.board) {
+        for (var file in state.board[rank]) {
+            state.board[rank][file] = this.board[rank][file];
+        }
+    }
+    return state;
+};
+
+ChessState.prototype.empty = function () {
+    for (var rank in this.board) {
+        for (var file in this.board[rank]) {
+            this.board[rank][file] = 0;
+        }
+    }
+};
+
 ChessState.prototype.move = function (move) {
     move = move.toUpperCase();
     // Move string: <Piece><src_file><src_rank><dest_file><dest_rank>
     var sourcePiece = this.board[move[2]][move[1]];
     var destPiece = this.board[move[4]][move[3]];
+
+    this.board[move[4]][move[3]] = sourcePiece;
+    this.board[move[2]][move[1]] = 0;
 
     if (destPiece) {
         return new MoveDefinition.Capture(move[1] + move[2], move[3] + move[4]);
@@ -66,8 +92,6 @@ ChessState.prototype.move = function (move) {
     }
 
     // TODO Check for castling, and en passant
-
-    this.board[destRank][destFile] = piece;
 };
 
 MoveDefinition = {};

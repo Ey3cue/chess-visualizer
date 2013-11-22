@@ -5,14 +5,14 @@ var _camera;
 var _scene;
 
 var _gui;
+var _stats;
 
 var _state;
+var _previousState;
 
 (function () {
 
 var Control = {};
-
-var stats;
 
 /**
  * Performs various initialization steps for the application.
@@ -23,7 +23,12 @@ Control.init = function () {
     $('#chessVisualizer')[0].appendChild(_renderer.domElement);
 
     _state = new ChessState();
+    _previousState = new ChessState();
+    _previousState.empty();
+    
     _gui = new dat.GUI();
+
+    Alert.init();
 
     ChessLoader.init();
     ChessLoader.addDefaults();
@@ -34,17 +39,19 @@ Control.init = function () {
 };
 
 Control.initStats = function () {
-    stats = new Stats();
+    _stats = new Stats();
 
     // Align top-left
-    stats.domElement.style.position = 'absolute';
-    stats.domElement.style.left = '0px';
-    stats.domElement.style.top = '0px';
+    _stats.domElement.style.position = 'absolute';
+    _stats.domElement.style.left = '0px';
+    _stats.domElement.style.top = '0px';
 
-    document.body.appendChild(stats.domElement);
+    document.body.appendChild(_stats.domElement);
 };
 
 Control.resize = function () {
+    Alert.resizeLoader();
+
     _camera.aspect = window.innerWidth / window.innerHeight;
     _camera.updateProjectionMatrix();
 
@@ -55,7 +62,7 @@ window.onload = Control.init;
 window.onresize = Control.resize;
 
 Control.animate = function () {
-    stats.begin();
+    _stats.begin();
 
     requestAnimationFrame(Control.animate);
 
@@ -63,7 +70,7 @@ Control.animate = function () {
 
     _renderer.render(_scene, _camera);
 
-    stats.end();
+    _stats.end();
 };
 
 // Make available globally

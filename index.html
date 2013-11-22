@@ -6,6 +6,8 @@
     <title>Title</title>
     
     <link rel="stylesheet" type="text/css" href="vendor/normalize.css">
+    <link rel="stylesheet" type="text/css" href="vendor/loader.css">
+
     <link rel="stylesheet" type="text/css" href="resources/css/main.css">  
 
     <!-- Favicon -->
@@ -14,6 +16,10 @@
 
     <!-- Libraries -->
     <script type="text/javascript" src="vendor/jquery/jquery-2.0.3.min.js"></script>
+
+    <script type="text/javascript" src="vendor/jquery/noty/jquery.noty.js"></script>
+    <script type="text/javascript" src="vendor/jquery/noty/layouts/topCenter.js"></script>
+    <script type="text/javascript" src="vendor/jquery/noty/themes/default.js"></script>
 
     <script type="text/javascript" src="vendor/threejs/Three.js"></script>
     <script type="text/javascript" src="vendor/threejs/OrbitControls.js"></script>
@@ -30,6 +36,7 @@
 
     <script type="text/javascript" src="resources/js/control.js"></script>
     <script type="text/javascript" src="resources/js/controlGame.js"></script>
+    <script type="text/javascript" src="resources/js/controlAlerts.js"></script>
 
     <script type="text/javascript" src="resources/js/chessState.js"></script>
 
@@ -40,5 +47,15 @@
 </head>
 <body>
     <div id="chessVisualizer"></div>
+    <div id="loader">
+        <div class="blockG" id="rotateG_01"></div>
+        <div class="blockG" id="rotateG_02"></div>
+        <div class="blockG" id="rotateG_03"></div>
+        <div class="blockG" id="rotateG_04"></div>
+        <div class="blockG" id="rotateG_05"></div>
+        <div class="blockG" id="rotateG_06"></div>
+        <div class="blockG" id="rotateG_07"></div>
+        <div class="blockG" id="rotateG_08"></div>
+    </div>
 </body>
 </html>
