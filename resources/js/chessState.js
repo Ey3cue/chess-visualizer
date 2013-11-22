@@ -17,7 +17,7 @@ function ChessState() {
 /**
  * Initializes the state.
  */
-ChessState.prototype.init = function () {
+ChessState.prototype.init = ChessState.prototype.reset = function () {
     /*
         Starting State:
            A  B  C  D  E  F  G  H
@@ -51,11 +51,6 @@ ChessState.prototype.init = function () {
        2: { A: P.wP, B: P.wP, C: P.wP, D: P.wP, E: P.wP, F: P.wP, G: P.wP, H: P.wP },
        1: { A: P.wR, B: P.wN, C: P.wB, D: P.wQ, E: P.wK, F: P.wB, G: P.wN, H: P.wR }
     };
-};
-
-ChessState.prototype.reset = function () {
-    _previousState = this.clone();
-    this.init();
 };
 
 ChessState.prototype.clone = function () {

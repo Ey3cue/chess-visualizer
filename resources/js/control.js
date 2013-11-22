@@ -8,7 +8,6 @@ var _gui;
 var _stats;
 
 var _state;
-var _previousState;
 
 (function () {
 
@@ -23,9 +22,7 @@ Control.init = function () {
     $('#chessVisualizer')[0].appendChild(_renderer.domElement);
 
     _state = new ChessState();
-    _previousState = new ChessState();
-    _previousState.empty();
-    
+
     _gui = new dat.GUI();
 
     Alert.init();

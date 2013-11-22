@@ -9,7 +9,6 @@ var ControlGame = {};
 var GAME_URL = 'http://www.bencarle.com/chess/cg/';
 
 var gameTimeout;
-var isFollowingGame = false;
 var currentGameId;
 var currentMovesList;
 
@@ -42,7 +41,7 @@ ControlGame.init = function () {
 };
 
 function startGame() {
-    if (isFollowingGame) {
+    if (gameTimeout) {
         if (currentGameId === _gameParams.gameId) {
             Alert.info('You are already following game ' + currentGameId + '.');
         } else {
@@ -51,7 +50,6 @@ function startGame() {
             followGame();
         }
     } else {
-        isFollowingGame = true;
         currentGameId = _gameParams.gameId;
         followGame();
     }
@@ -68,7 +66,8 @@ function followGame() {
         error: function () {
             Alert.done();
             Alert.error('Unable to retrieve game ' + currentGameId + '.');
-            isFollowingGame = false;
+            // Will have been cleared by activation at this point
+            gameTimeout = null;
         }
     });
 }
@@ -77,7 +76,7 @@ function updateGame(response) {
     Alert.done();
     var i;
 
-    if (!currentMovesList) {
+    if (!gameTimeout) {
         // Following new game
         Alert.info('Now following game ' + currentGameId + '.');
         _state.reset();
@@ -94,36 +93,30 @@ function updateGame(response) {
         currentMovesList = response.moves;
     }
 
-    if (isFollowingGame) {
-        gameTimeout = setTimeout(followGame, _gameParams.pollingInterval * 1000);
-    }
+    gameTimeout = setTimeout(followGame, _gameParams.pollingInterval * 1000);
 }
 
 function stopGame() {
-    if (isFollowingGame) {
-        isFollowingGame = false;
+    if (gameTimeout) {
         clearTimeout(gameTimeout);
         gameTimeout = null;
-
-        Alert.info('Stopped following game ' + currentGameId + '.');
-
         currentGameId = null;
         currentMovesList = null;
+        Chess.stop();
 
-        _state.reset();
-        Chess.setSceneWithState();
+        Alert.info('Stopped following game ' + currentGameId + '.');
     } else {
         Alert.error('Not currently following a game.');
     }
 }
 
 function resetGame() {
-    if (isFollowingGame) {
+    if (gameTimeout) {
         Alert.info('Playing game ' + currentGameId + ' from the beginning.');
         _state.reset();
         Chess.setSceneWithState();
         for (var i = 0; i < currentMovesList.length; i++) {
-            //Chess.move(currentMovesList[i]);
+            Chess.move(currentMovesList[i]);
         }
     } else {
         Alert.error('Not currently following a game.');
