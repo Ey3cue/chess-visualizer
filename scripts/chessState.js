@@ -14,6 +14,9 @@ function ChessState() {
 	this.initState();
 }
 
+/**
+ * Initializes the state.
+ */
 ChessState.prototype.initState = function () {
     /*
         Starting State:
@@ -29,80 +32,71 @@ ChessState.prototype.initState = function () {
            A  B  C  D  E  F  G  H
 
         Using objects here adds a good amount of overhead to each state, but since this isn't AI,
-        space and time are not an issue, and this makes the code a lot more legible as ranks and 
-        files correspond directly to their counterparts on the board.
+        space and time are not an issue when representing the state, and this makes the code a lot 
+        more legible as ranks and files correspond directly to their counterparts on the board.
 
         If this were an AI, I'd represent the state with bitmaps, shown in the state I worked on
         here: https://github.com/mew2057/Shallow-Red/blob/master/scripts/chessNode.js
     */
 
-    var P = PIECES;
+    var P = Chess.PIECES;
 
     this.board = {
-       8: { A: P.bR, B: P.bN, C: P.bB, D: P.bK, E: P.bQ, F: P.bB, G: P.bN, H: P.bR },
+       8: { A: P.bR, B: P.bN, C: P.bB, D: P.bQ, E: P.bK, F: P.bB, G: P.bN, H: P.bR },
        7: { A: P.bP, B: P.bP, C: P.bP, D: P.bP, E: P.bP, F: P.bP, G: P.bP, H: P.bP },
        6: { A:    0, B:    0, C:    0, D:    0, E:    0, F:    0, G:    0, H:    0 },
        5: { A:    0, B:    0, C:    0, D:    0, E:    0, F:    0, G:    0, H:    0 },
        4: { A:    0, B:    0, C:    0, D:    0, E:    0, F:    0, G:    0, H:    0 },
        3: { A:    0, B:    0, C:    0, D:    0, E:    0, F:    0, G:    0, H:    0 },
        2: { A: P.wP, B: P.wP, C: P.wP, D: P.wP, E: P.wP, F: P.wP, G: P.wP, H: P.wP },
-       1: { A: P.wR, B: P.wN, C: P.wB, D: P.wK, E: P.wQ, F: P.wB, G: P.wN, H: P.wR }
+       1: { A: P.wR, B: P.wN, C: P.wB, D: P.wQ, E: P.wK, F: P.wB, G: P.wN, H: P.wR }
     };
 };
 
 ChessState.prototype.move = function (move) {
+    move = move.toUpperCase();
     // Move string: <Piece><src_file><src_rank><dest_file><dest_rank>
-    var sourceFile = move[1], sourceRank = parseInt(move[2]);
-    var destFile = move[3], destRank = parseInt(move[4]);
-    var piece = this.board[sourceRank][sourceFile];
+    var sourcePiece = this.board[move[2]][move[1]];
+    var destPiece = this.board[move[4]][move[3]];
+
+    if (destPiece) {
+        return new MoveDefinition.Capture(move[1] + move[2], move[3] + move[4]);
+    } else {
+        return new MoveDefinition.Normal(move[1] + move[2], move[3] + move[4]);
+    }
 
     // TODO Check for castling, and en passant
 
     this.board[destRank][destFile] = piece;
 };
 
-var PIECES = ChessState.PIECES = Utils.bidirectional({
-    // Empty space
-    na: 0,
-    // White
-    wP: 1,
-    wR: 2,
-    wN: 3,
-    wQ: 4,
-    wK: 5,
-    wB: 6,
-    // Black
-    bP: 9,
-    bR: 10,
-    bN: 11,
-    bQ: 12,
-    bK: 13,
-    bB: 14
-});
+MoveDefinition = {};
 
-var FILES = ChessState.FILES = {
-    'A': 0,
-    'B': 1,
-    'C': 2,
-    'D': 3,
-    'E': 4,
-    'F': 5,
-    'G': 6,
-    'H': 7
+MoveDefinition.Normal = function (start, end) {
+    this.start = start;
+    this.end = end;
 };
 
-var RANKS = ChessState.RANKS = {
-    1: 0,
-    2: 1,
-    3: 2,
-    4: 3,
-    5: 4,
-    6: 5,
-    7: 6,
-    8: 7
+MoveDefinition.Capture = function (start, end) {
+    this.start = start;
+    this.end = end;
+};
+
+MoveDefinition.EnPassant = function (start, end, remove) {
+    this.start = start;
+    this.end = end;
+    this.remove = remove;
+};
+
+MoveDefinition.Castle = function (start, kingEnd, rookStart, rookEnd) {
+    this.start = start;
+    this.kingEnd = kingEnd;
+    this.rookStart = rookStart;
+    this.rookEnd = rookEnd;
 };
 
 // Make available globally
 window.ChessState = ChessState;
+window.MoveDefinition = MoveDefinition;
 
 })();

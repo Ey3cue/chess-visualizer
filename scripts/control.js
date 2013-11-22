@@ -38,7 +38,8 @@ window.onresize = Control.resize;
 Control.animate = function () {
     requestAnimationFrame(Control.animate);
 
-    _camera.lookAt(_scene.position);
+    Chess.update();
+
     _renderer.render(_scene, _camera);
 };
 
