@@ -6,7 +6,15 @@ var _gameParams;
 
 var ControlGame = {};
 
-var GAME_URL = 'http://www.bencarle.com/chess/cg/';
+var GAME_URLS = {
+    'bencarle': 'http://www.bencarle.com/chess/cg/',
+    '10.11.18.65': 'http://10.11.18.65/cg/chess/'
+};
+
+var URL_ERRORS = {
+    'bencarle': 'Note that cross-domain requests must be allowed to use this URL.',
+    '10.11.18.65': 'Note that you must be connected to the Marist internal network to use this URL.'
+};
 
 var gameTimeout;
 var currentGameId;
@@ -22,6 +30,7 @@ ControlGame.init = function () {
     folder.add(_generalParams, 'showStats').onChange(function () { $('#stats').toggle(); });
 
     _gameParams = {
+        gameUrl: '10.11.18.65',
         gameId: '340',
         showGame: startGame,
         stopGame: stopGame,
@@ -31,6 +40,7 @@ ControlGame.init = function () {
     };
 
     folder = _gui.addFolder('Current Game');
+    folder.add(_gameParams, 'gameUrl', Object.keys(GAME_URLS));
     folder.add(_gameParams, 'gameId').listen();
     folder.add(_gameParams, 'showGame');
     folder.add(_gameParams, 'stopGame');
@@ -59,13 +69,14 @@ function followGame() {
     Alert.loading();
     $.ajax({
         method: 'GET',
-        url: GAME_URL + currentGameId,
+        url: GAME_URLS[_gameParams.gameUrl] + currentGameId,
+        crossDomain: true,
         contentType: 'application/json; charset=UTF-8',
         dataType: 'json',
         success: updateGame,
         error: function () {
             Alert.done();
-            Alert.error('Unable to retrieve game ' + currentGameId + '.<br>Are cross-domain requests allowed?');
+            Alert.error('Unable to retrieve game ' + currentGameId + '.<br>' + URL_ERRORS[_gameParams.gameUrl]);
             // Will have been cleared by activation at this point
             gameTimeout = null;
         }
@@ -76,35 +87,45 @@ function updateGame(response) {
     Alert.done();
     var i;
 
-    if (!gameTimeout) {
-        // Following new game
-        Alert.info('Now following game ' + currentGameId + '.');
-        _state.reset();
-        currentMovesList = response.moves;
-        for (i = 0; i < currentMovesList.length; i++) {
-            _state.move(currentMovesList[i]);
+    try {
+        if (!gameTimeout) {
+            // Following new game
+            _state.reset();
+            currentMovesList = response.moves;
+            for (i = 0; i < currentMovesList.length; i++) {
+                _state.move(currentMovesList[i]);
+            }
+            Chess.setSceneWithState();
+            Alert.info('Now following game ' + currentGameId + '.');
+        } else {
+            // Check for any new moves
+            for (i = currentMovesList.length; i < response.moves.length; i++) {
+                Chess.move(response.moves[i]);
+            }
+            currentMovesList = response.moves;
         }
-        Chess.setSceneWithState();
-    } else {
-        // Check for any new moves
-        for (i = currentMovesList.length; i < response.moves.length; i++) {
-            Chess.move(response.moves[i]);
-        }
-        currentMovesList = response.moves;
-    }
 
-    gameTimeout = setTimeout(followGame, _gameParams.pollingInterval * 1000);
-}
-
-function stopGame() {
-    if (gameTimeout) {
+        gameTimeout = setTimeout(followGame, _gameParams.pollingInterval * 1000);
+    } catch (e) {
         clearTimeout(gameTimeout);
         gameTimeout = null;
         currentGameId = null;
         currentMovesList = null;
         Chess.stop();
+        Alert.error('An unknown error occured following game.<br>See console for details.' +
+                    '<br>Stopped following game ' + currentGameId + '.');
+        throw e;
+    }
+}
 
+function stopGame() {
+    if (gameTimeout) {
         Alert.info('Stopped following game ' + currentGameId + '.');
+        clearTimeout(gameTimeout);
+        gameTimeout = null;
+        currentGameId = null;
+        currentMovesList = null;
+        Chess.stop();
     } else {
         Alert.error('Not currently following a game.');
     }

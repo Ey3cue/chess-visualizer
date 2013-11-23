@@ -31,7 +31,8 @@ Chess.init = function () {
     initCamera();
     initLighting();
 
-    Alert.warn('PLEASE ALLOW ALL ANIMATIONS TO COMPLETE WHEN INTERACTING WITH GUI.');
+    Alert.warn('To avoid error, please allow ALL animations and loading to complete BEFORE interacting with the GUI.' +
+               '<br><br>Note that castling and en passant moves are not yet supported.');
 
     Control.animate();
 };

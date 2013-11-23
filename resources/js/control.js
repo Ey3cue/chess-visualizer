@@ -24,6 +24,7 @@ Control.init = function () {
     _state = new ChessState();
 
     _gui = new dat.GUI();
+    _gui.width = 280;
 
     Alert.init();
 

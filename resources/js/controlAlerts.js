@@ -10,16 +10,17 @@ Alert.init = function () {
     Alert.done();
 };
 
-Alert.alert       = function (message) { deafaultMessage(message, 'alert'      ); };
-Alert.success     = function (message) { deafaultMessage(message, 'success'    ); };
-Alert.error       = function (message) { deafaultMessage(message, 'error'      ); };
-Alert.warn        = function (message) { deafaultMessage(message, 'warning'    ); };
-Alert.info        = function (message) { deafaultMessage(message, 'information'); };
+Alert.alert       = function (message) { deafaultMessage(message, 'alert',        5000); };
+Alert.success     = function (message) { deafaultMessage(message, 'success',      5000); };
+Alert.error       = function (message) { deafaultMessage(message, 'error',       10000); };
+Alert.warn        = function (message) { deafaultMessage(message, 'warning',     10000); };
+Alert.info        = function (message) { deafaultMessage(message, 'information',  5000); };
 
-function deafaultMessage(message, type) {
+function deafaultMessage(message, type, timeout) {
     noty({
         text: message,
-        type: type
+        type: type || 'alert',
+        timeout: timeout || 5000
     });
 }
 
@@ -33,8 +34,8 @@ Alert.done = function () {
 
 Alert.resizeLoader = function () {
 	$('#loader').css({
-        top: window.innerHeight - 169,
-        left: window.innerWidth - 160
+        top: window.innerHeight - $('#loader').height() - 50,
+        left: window.innerWidth - $('#loader').width() - 70
     });
 };
 
