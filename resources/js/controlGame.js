@@ -8,7 +8,7 @@ var ControlGame = {};
 
 var GAME_URLS = {
     'bencarle': 'http://www.bencarle.com/chess/cg/',
-    '10.11.18.65': 'http://10.11.18.65/cg/chess/'
+    '10.11.18.65': 'https://10.11.18.65/cg/chess/'
 };
 
 var URL_ERRORS = {
