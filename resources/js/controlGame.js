@@ -107,13 +107,13 @@ function updateGame(response) {
 
         gameTimeout = setTimeout(followGame, _gameParams.pollingInterval * 1000);
     } catch (e) {
+        Alert.error('An unknown error occured following game.<br>See console for details.' +
+                    '<br>Stopped following game ' + currentGameId + '.');
         clearTimeout(gameTimeout);
         gameTimeout = null;
         currentGameId = null;
         currentMovesList = null;
         Chess.stop();
-        Alert.error('An unknown error occured following game.<br>See console for details.' +
-                    '<br>Stopped following game ' + currentGameId + '.');
         throw e;
     }
 }
