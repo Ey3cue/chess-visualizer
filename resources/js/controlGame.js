@@ -65,7 +65,7 @@ function followGame() {
         success: updateGame,
         error: function () {
             Alert.done();
-            Alert.error('Unable to retrieve game ' + currentGameId + '.');
+            Alert.error('Unable to retrieve game ' + currentGameId + '.<br>Are cross-domain requests allowed?');
             // Will have been cleared by activation at this point
             gameTimeout = null;
         }
