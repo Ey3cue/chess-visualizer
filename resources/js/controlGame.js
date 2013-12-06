@@ -30,14 +30,27 @@ ControlGame.init = function () {
     folder.add(_generalParams, 'showStats').onChange(function () { $('#stats').toggle(); });
 
     _gameParams = {
-        gameUrl: '10.11.18.65',
-        gameId: '340',
+        viewWhite: Camera.viewWhite,
+        viewBlack: Camera.viewBlack,
+        viewNuetral: Camera.viewNuetral,
+        viewTopDown: Camera.viewTopDown,
+
+        //gameUrl: '10.11.18.65',
+        gameUrl: 'bencarle',
+        //gameId: '340',
+        gameId: '52',
         showGame: startGame,
         stopGame: stopGame,
         pollingInterval: 2,
         playFromBeginning: resetGame,
         waitBetweenMoves: 0.1
     };
+
+    folder = _gui.addFolder('Camera Controls');
+    folder.add(_gameParams, 'viewWhite');
+    folder.add(_gameParams, 'viewBlack');
+    folder.add(_gameParams, 'viewNuetral');
+    folder.add(_gameParams, 'viewTopDown');
 
     folder = _gui.addFolder('Current Game');
     folder.add(_gameParams, 'gameUrl', Object.keys(GAME_URLS));

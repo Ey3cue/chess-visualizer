@@ -7,6 +7,8 @@ var models;
 var chess;
 var board;
 
+var chessTweens;
+
 /**
  * Initializes the board.
  */
@@ -22,10 +24,10 @@ Chess.init = function () {
         1: { A: null, B: null, C: null, D: null, E: null, F: null, G: null, H: null }
     };
 
-    movesQueue = [];
+    chessTweens = new TweenQueue();
 
     initScene();
-    initCamera();
+    Camera.init();
     initLighting();
 
     Alert.warn('To avoid error, please allow ALL animations and loading to complete BEFORE interacting with the GUI.' +
@@ -47,14 +49,6 @@ function initLighting() {
             _scene.add(Utils.createPointLight(i * distanceFactor, height, j * distanceFactor));
         }
     }
-}
-
-function initCamera() {
-    _camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
-    _camera.position.set(0, 200, 350);
-    _camera.lookAt(_scene.position);
-
-    new THREE.OrbitControls(_camera, $('#chessVisualizer')[0]);
 }
 
 function initScene() {
@@ -146,18 +140,18 @@ Chess.move = function (move) {
         break;
     case MoveDefinition.Capture:
         console.log('Capture');
-        Chess.addTween({
+        chessTweens.addTween({
             model: destModel,
             scale: Utils.xyz(0),
             callback: function () { board.remove(destModel); }
         });
         // Fall through
     case MoveDefinition.Normal:
-        Chess.addTween({
+        chessTweens.addTween({
             model: sourceModel,
             position: Utils.cellToXyz(moveDef.end)
         });
-        Chess.startTweens();
+        chessTweens.startTweens();
         break;
     default:
         break;
@@ -166,7 +160,7 @@ Chess.move = function (move) {
 
 Chess.update = function () {
     TWEEN.update();
-    Chess.updateTweens();
+    TweenQueue.updateTweens();
 };
 
 // Make available globally

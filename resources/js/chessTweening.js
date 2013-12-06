@@ -1,26 +1,32 @@
 
 (function () {
 
-var tweenOptionsListQueue = [];
-var currentTweenOptionsList = null;
+var tweenQueues = [];
 
-var tweenOptionsSetupList = [];
+function TweenQueue() {
+    this.tweenOptionsListQueue = [];
+    this.currentTweenOptionsList = null;
 
-Chess.addTween = function (options) {
-    tweenOptionsSetupList.push(options);
+    this.tweenOptionsSetupList = [];
+
+    tweenQueues.push(this);
+}
+
+TweenQueue.prototype.addTween = function (options) {
+    this.tweenOptionsSetupList.push(options);
 };
 
-Chess.startTweens = function () {
-    tweenOptionsListQueue.push(tweenOptionsSetupList);
-    tweenOptionsSetupList = [];
+TweenQueue.prototype.startTweens = function () {
+    this.tweenOptionsListQueue.push(this.tweenOptionsSetupList);
+    this.tweenOptionsSetupList = [];
 };
 
-Chess.stopTweens = function () {
-    tweenOptionsListQueue = [];
-    tweenOptionsSetupList = [];
+TweenQueue.prototype.stopTweens = function () {
+    this.tweenOptionsListQueue = [];
+    this.tweenOptionsSetupList = [];
 };
 
-function startTweenSet(options) {
+function startTweenSet(self, options) {
     var model      = options.model,
         startPos   = Utils.vec3ToXyz(options.model.position),
         startRot   = Utils.vec3ToXyz(options.model.rotation),
@@ -49,28 +55,35 @@ function startTweenSet(options) {
                 .delay(delay)
                 .onUpdate(function () { model.scale.set(Math.max(startScale.x, 0.01), Math.max(startScale.y, 0.01), Math.max(startScale.z, 0.01)); })
                 .onComplete(function () {
-                    currentTweenOptionsList = null;
+                    self.currentTweenOptionsList = null;
                     callback();
                 })
                 .start();
 }
 
-Chess.updateTweens = function () {
-    if (!currentTweenOptionsList && tweenOptionsListQueue.length) {
-        currentTweenOptionsList = tweenOptionsListQueue.shift();
+TweenQueue.prototype.updateTweens = function () {
+    if (!this.currentTweenOptionsList && this.tweenOptionsListQueue.length) {
+        this.currentTweenOptionsList = this.tweenOptionsListQueue.shift();
 
         // Putting this in a setTimeout seemes to prevent a heizenbug in which sometimes more than
-        //   one piece will animate at once.
+        //   one piece will animate at once. Whenever I try to add debugging statements to attempt
+        //   to fix it, it disappears...
+        var self = this;
         setTimeout(function () {
-            for (var i = currentTweenOptionsList.length - 1; i >= 0; i--) {
-                startTweenSet(currentTweenOptionsList[i]);
+            for (var i = self.currentTweenOptionsList.length - 1; i >= 0; i--) {
+                startTweenSet(self, self.currentTweenOptionsList[i]);
             }
         }, 0);
     }
 };
 
-function startSequence() {
+TweenQueue.updateTweens = function () {
+    for (var i = tweenQueues.length - 1; i >= 0; i--) {
+        tweenQueues[i].updateTweens();
+    }
+};
 
-}
+// Make available globally
+window.TweenQueue = TweenQueue;
 
 })();
