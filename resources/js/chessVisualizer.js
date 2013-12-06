@@ -30,8 +30,7 @@ Chess.init = function () {
     Camera.init();
     initLighting();
 
-    Alert.warn('To avoid error, please allow ALL animations and loading to complete BEFORE interacting with the GUI.' +
-               '<br><br>Note that castling and en passant moves are not yet supported.');
+    Alert.warn('To avoid error, please allow ALL animations and loading to complete BEFORE interacting with the GUI.');
 
     Control.animate();
 };
@@ -170,6 +169,27 @@ Chess.move = function (move) {
         break;
     default:
         break;
+    }
+
+    if (moveDef.promotion) {
+        var newModel = ChessLoader.get(moveDef.promotion);
+        newModel.position = Utils.cellToVec3(moveDef.end);
+        newModel.rotation.y = Chess.PIECE_ROTATIONS[moveDef.promotion];
+        newModel.scale = Utils.vec3(0.01);
+        board.add(newModel);
+        models[move[4]][move[3]] = newModel;
+        chessTweens.addTween({
+            model: sourceModel,
+            scale: Utils.xyz(0.01),
+            delay: 0,
+            callback: function () { board.remove(sourceModel); }
+        });
+        chessTweens.addTween({
+            model: newModel,
+            scale: Utils.vec3(Chess.PIECE_SCALE_FACTOR[moveDef.promotion]),
+            delay: 0
+        });
+        chessTweens.startTweens();
     }
 };
 

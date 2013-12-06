@@ -40,10 +40,10 @@ ControlGame.init = function () {
         customMoveSequence: 'Pe2e4,Pf7f4,Pe4f5', // En passant check
         playMoveSequence: playCustomMoveSequence,
 
-        //gameUrl: '10.11.18.65',
-        gameUrl: 'bencarle',
-        //gameId: '340',
-        gameId: '52',
+        gameUrl: '10.11.18.65',
+        //gameUrl: 'bencarle',
+        gameId: '340',
+        //gameId: '52',
         showGame: startGame,
         stopGame: stopGame,
         pollingInterval: 2,

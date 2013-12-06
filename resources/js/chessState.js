@@ -80,9 +80,12 @@ ChessState.prototype.move = function (move) {
     this.board[move[4]][move[3]] = sourcePiece;
     this.board[move[2]][move[1]] = 0;
 
+    var sourceCell = move[1] + move[2];
+    var destCell = move[3] + move[4];
+
     // Check for castling (i.e. if the king moves more than 1 file)
     if (isType('K', sourcePiece) && Math.abs(Chess.FILES[move[1]] - Chess.FILES[move[3]]) > 1) {
-        switch (move[3] + move[4]) {
+        switch (destCell) {
         // White king-side
         case 'G1': return new MoveDefinition.Castle('E1', 'G1', 'H1', 'F1');
         // White queen-side
@@ -94,37 +97,46 @@ ChessState.prototype.move = function (move) {
         }
     }
 
+    // Check for promotions
+    var promotion = move[5];
+    if (promotion) {
+        promotion = (isWhite(sourcePiece) ? 'w' : 'b') + promotion;
+        this.board[move[4]][move[3]] = Chess.PIECES[promotion];
+    }
+
     // Check for en passant - pawn changes files, but it's not a capture
     if (isType('P', sourcePiece) && !destPiece && Chess.FILES[move[1]] !== Chess.FILES[move[3]]) {
-        return new MoveDefinition.EnPassant(move[1] + move[2], move[3] + move[4],
-                move[3] + (parseInt(move[4]) + (isWhite(sourcePiece) ? -1 : 1)));
+        return new MoveDefinition.EnPassant(sourceCell, destCell,
+                move[3] + (parseInt(move[4]) + (isWhite(sourcePiece) ? -1 : 1)), promotion);
     }
 
+    // Check for captures
     if (destPiece) {
-        return new MoveDefinition.Capture(move[1] + move[2], move[3] + move[4]);
-    } else {
-        return new MoveDefinition.Normal(move[1] + move[2], move[3] + move[4]);
+        return new MoveDefinition.Capture(sourceCell, destCell, promotion);
     }
-
-    // TODO Check for castling, and en passant
+    
+    return new MoveDefinition.Normal(sourceCell, destCell, promotion);
 };
 
 MoveDefinition = {};
 
-MoveDefinition.Normal = function (start, end) {
+MoveDefinition.Normal = function (start, end, promotion) {
     this.start = start;
     this.end = end;
+    this.promotion = promotion;
 };
 
-MoveDefinition.Capture = function (start, end) {
+MoveDefinition.Capture = function (start, end, promotion) {
     this.start = start;
     this.end = end;
+    this.promotion = promotion;
 };
 
-MoveDefinition.EnPassant = function (start, end, remove) {
+MoveDefinition.EnPassant = function (start, end, remove, promotion) {
     this.start = start;
     this.end = end;
     this.remove = remove;
+    this.promotion = promotion;
 };
 
 MoveDefinition.Castle = function (kingStart, kingEnd, rookStart, rookEnd) {
