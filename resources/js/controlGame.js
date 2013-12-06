@@ -36,7 +36,7 @@ ControlGame.init = function () {
         stopGame: stopGame,
         pollingInterval: 2,
         playFromBeginning: resetGame,
-        waitBetweenMoves: 0.5
+        waitBetweenMoves: 0.1
     };
 
     folder = _gui.addFolder('Current Game');
@@ -46,7 +46,7 @@ ControlGame.init = function () {
     folder.add(_gameParams, 'stopGame');
     folder.add(_gameParams, 'playFromBeginning');
     folder.add(_gameParams, 'pollingInterval', 1, 10).step(0.5);
-    folder.add(_gameParams, 'waitBetweenMoves', 0, 10).step(0.5);
+    folder.add(_gameParams, 'waitBetweenMoves', 0.1, 2).step(0.1);
     folder.open();
 };
 

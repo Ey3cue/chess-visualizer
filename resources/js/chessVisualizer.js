@@ -7,9 +7,6 @@ var models;
 var chess;
 var board;
 
-var movesQueue;
-var currentMove;
-
 /**
  * Initializes the board.
  */
@@ -122,19 +119,15 @@ Chess.setSceneWithState = function (isFirstSet) {
     //Chess.startTweens();
 };
 
-Chess.move = function (move) {
-    movesQueue.push(move);
-};
-
 Chess.stop = function () {
-    movesQueue = [];
+    Chess.stopTweens();
 };
 
 function clearMove() {
     currentMove = null;
 }
 
-function move(move) {
+Chess.move = function (move) {
     console.log(move);
     move = move.toUpperCase();
     var moveDef = _state.move(move);
@@ -162,22 +155,16 @@ function move(move) {
     case MoveDefinition.Normal:
         Chess.addTween({
             model: sourceModel,
-            position: Utils.cellToXyz(moveDef.end),
-            callback: clearMove
+            position: Utils.cellToXyz(moveDef.end)
         });
         Chess.startTweens();
         break;
     default:
         break;
     }
-}
+};
 
 Chess.update = function () {
-    if (!currentMove && movesQueue.length) {
-        currentMove = movesQueue.shift();
-        move(currentMove);
-    }
-
     TWEEN.update();
     Chess.updateTweens();
 };

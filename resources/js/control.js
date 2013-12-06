@@ -60,9 +60,9 @@ window.onload = Control.init;
 window.onresize = Control.resize;
 
 Control.animate = function () {
-    _stats.begin();
-
     requestAnimationFrame(Control.animate);
+    
+    _stats.begin();
 
     Chess.update();
 
