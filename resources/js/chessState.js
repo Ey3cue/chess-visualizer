@@ -87,13 +87,25 @@ ChessState.prototype.move = function (move) {
     if (isType('K', sourcePiece) && Math.abs(Chess.FILES[move[1]] - Chess.FILES[move[3]]) > 1) {
         switch (destCell) {
         // White king-side
-        case 'G1': return new MoveDefinition.Castle('E1', 'G1', 'H1', 'F1');
+        case 'G1':
+            this.board[1]['F'] = Chess.PIECES.wR;
+            this.board[1]['H'] = 0;
+            return new MoveDefinition.Castle('E1', 'G1', 'H1', 'F1');
         // White queen-side
-        case 'C1': return new MoveDefinition.Castle('E1', 'C1', 'A1', 'D1');
+        case 'C1':
+            this.board[1]['D'] = Chess.PIECES.wR;
+            this.board[1]['A'] = 0;
+            return new MoveDefinition.Castle('E1', 'C1', 'A1', 'D1');
         // Black king-side
-        case 'G8': return new MoveDefinition.Castle('E8', 'G8', 'H8', 'F8');
+        case 'G8':
+            this.board[8]['F'] = Chess.PIECES.bR;
+            this.board[8]['H'] = 0;
+            return new MoveDefinition.Castle('E8', 'G8', 'H8', 'F8');
         // Black queen-side
-        case 'C8': return new MoveDefinition.Castle('E8', 'C8', 'A8', 'D8');
+        case 'C8':
+            this.board[8]['D'] = Chess.PIECES.bR;
+            this.board[8]['A'] = 0;
+            return new MoveDefinition.Castle('E8', 'C8', 'A8', 'D8');
         }
     }
 
@@ -104,15 +116,15 @@ ChessState.prototype.move = function (move) {
         this.board[move[4]][move[3]] = Chess.PIECES[promotion];
     }
 
+    // Check for captures
+    if (destPiece) {
+        return new MoveDefinition.Capture(sourceCell, destCell, promotion);
+    }
+
     // Check for en passant - pawn changes files, but it's not a capture
     if (isType('P', sourcePiece) && !destPiece && Chess.FILES[move[1]] !== Chess.FILES[move[3]]) {
         return new MoveDefinition.EnPassant(sourceCell, destCell,
                 move[3] + (parseInt(move[4]) + (isWhite(sourcePiece) ? -1 : 1)), promotion);
-    }
-
-    // Check for captures
-    if (destPiece) {
-        return new MoveDefinition.Capture(sourceCell, destCell, promotion);
     }
     
     return new MoveDefinition.Normal(sourceCell, destCell, promotion);

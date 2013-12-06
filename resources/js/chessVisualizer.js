@@ -135,6 +135,7 @@ Chess.move = function (move) {
             position: Utils.cellToXyz(moveDef.end)
         });
         var capturedModel = models[moveDef.remove[1]][moveDef.remove[0]];
+        models[moveDef.remove[1]][moveDef.remove[0]] = null;
         chessTweens.addTween({
             model: capturedModel,
             scale: Utils.xyz(0),
@@ -143,12 +144,17 @@ Chess.move = function (move) {
         chessTweens.startTweens();
         break;
     case MoveDefinition.Castle:
+        var rookModel = models[moveDef.rookStart[1]][moveDef.rookStart[0]];
+        // Move rook to new position
+        models[moveDef.rookStart[1]][moveDef.rookStart[0]] = null;
+        models[moveDef.rookEnd[1]][moveDef.rookEnd[0]] = rookModel;
+        // Animate castle
         chessTweens.addTween({
             model: sourceModel,
             position: Utils.cellToXyz(moveDef.kingEnd)
         });
         chessTweens.addTween({
-            model: models[moveDef.rookStart[1]][moveDef.rookStart[0]],
+            model: rookModel,
             position: Utils.cellToXyz(moveDef.rookEnd)
         });
         chessTweens.startTweens();
