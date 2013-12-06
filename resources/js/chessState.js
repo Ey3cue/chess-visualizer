@@ -94,6 +94,12 @@ ChessState.prototype.move = function (move) {
         }
     }
 
+    // Check for en passant - pawn changes files, but it's not a capture
+    if (isType('P', sourcePiece) && !destPiece && Chess.FILES[move[1]] !== Chess.FILES[move[3]]) {
+        return new MoveDefinition.EnPassant(move[1] + move[2], move[3] + move[4],
+                move[3] + (parseInt(move[4]) + (isWhite(sourcePiece) ? -1 : 1)));
+    }
+
     if (destPiece) {
         return new MoveDefinition.Capture(move[1] + move[2], move[3] + move[4]);
     } else {
@@ -130,6 +136,14 @@ MoveDefinition.Castle = function (kingStart, kingEnd, rookStart, rookEnd) {
 
 function isType(key, piece) {
     return (piece & 7) === Chess.PIECES['w' + key];
+}
+
+function isBlack(piece) {
+    return piece & 8;
+}
+
+function isWhite(piece) {
+    return !(piece & 8);
 }
 
 // Make available globally

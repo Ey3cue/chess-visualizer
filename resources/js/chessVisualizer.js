@@ -128,13 +128,22 @@ Chess.move = function (move) {
 
     models[move[4]][move[3]] = sourceModel;
     models[move[2]][move[1]] = null;
-    console.log(moveDef.constructor);
+
     switch (moveDef.constructor) {
     case MoveDefinition.EnPassant:
-        // TODO Tween en passant
+        chessTweens.addTween({
+            model: sourceModel,
+            position: Utils.cellToXyz(moveDef.end)
+        });
+        var capturedModel = models[moveDef.remove[1]][moveDef.remove[0]];
+        chessTweens.addTween({
+            model: capturedModel,
+            scale: Utils.xyz(0),
+            callback: function () { board.remove(capturedModel); }
+        });
+        chessTweens.startTweens();
         break;
     case MoveDefinition.Castle:
-        console.log('CASTLE');
         chessTweens.addTween({
             model: sourceModel,
             position: Utils.cellToXyz(moveDef.kingEnd)
@@ -146,7 +155,6 @@ Chess.move = function (move) {
         chessTweens.startTweens();
         break;
     case MoveDefinition.Capture:
-        console.log('Capture');
         chessTweens.addTween({
             model: destModel,
             scale: Utils.xyz(0),

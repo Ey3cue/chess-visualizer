@@ -36,7 +36,8 @@ ControlGame.init = function () {
         viewTopDown: Camera.viewTopDown,
 
         resetBoard: resetBoard,
-        customMoveSequence: 'Pe2e4,Bf1d3,Kg1f3,Ke1g1',
+        //customMoveSequence: 'Pe2e4,Bf1d3,Kg1f3,Ke1g1', // Castle check
+        customMoveSequence: 'Pe2e4,Pf7f4,Pe4f5', // En passant check
         playMoveSequence: playCustomMoveSequence,
 
         //gameUrl: '10.11.18.65',

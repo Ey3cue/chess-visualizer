@@ -34,6 +34,7 @@ function startTweenSet(self, options) {
         endPos     = options.position || { x: options.model.position.x, y: options.model.position.y, z: options.model.position.z },
         endRot     = options.rotation || { x: options.model.rotation.x, y: options.model.rotation.y, z: options.model.rotation.z },
         endScale   = options.scale    || { x: options.model.scale.x,    y: options.model.scale.y,    z: options.model.scale.z    },
+        duration   = options.duration || Chess.MOVE_DURATION,
         callback   = options.callback || function () {},
         delay      = _gameParams.waitBetweenMoves * 1000;
      
