@@ -35,6 +35,10 @@ ControlGame.init = function () {
         viewNuetral: Camera.viewNuetral,
         viewTopDown: Camera.viewTopDown,
 
+        resetBoard: resetBoard,
+        customMoveSequence: 'Pe2e4,Bf1d3,Kg1f3,Ke1g1',
+        playMoveSequence: playCustomMoveSequence,
+
         //gameUrl: '10.11.18.65',
         gameUrl: 'bencarle',
         //gameId: '340',
@@ -51,6 +55,12 @@ ControlGame.init = function () {
     folder.add(_gameParams, 'viewBlack');
     folder.add(_gameParams, 'viewNuetral');
     folder.add(_gameParams, 'viewTopDown');
+
+    folder = _gui.addFolder('Custom Game');
+    folder.add(_gameParams, 'resetBoard');
+    folder.add(_gameParams, 'customMoveSequence');
+    folder.add(_gameParams, 'playMoveSequence');
+    folder.open();
 
     folder = _gui.addFolder('Current Game');
     folder.add(_gameParams, 'gameUrl', Object.keys(GAME_URLS));
@@ -131,7 +141,7 @@ function updateGame(response) {
     }
 }
 
-function stopGame() {
+function stopGame(noErrorMessage) {
     if (gameTimeout) {
         Alert.info('Stopped following game ' + currentGameId + '.');
         clearTimeout(gameTimeout);
@@ -139,7 +149,7 @@ function stopGame() {
         currentGameId = null;
         currentMovesList = null;
         Chess.stop();
-    } else {
+    } else if (!noErrorMessage) {
         Alert.error('Not currently following a game.');
     }
 }
@@ -154,6 +164,28 @@ function resetGame() {
         }
     } else {
         Alert.error('Not currently following a game.');
+    }
+}
+
+function resetBoard() {
+    stopGame(true);
+    _state.reset();
+    Chess.setSceneWithState();
+}
+
+function playCustomMoveSequence() {
+    Alert.info('Playing custom move sequence.');
+    var movesList = _gameParams.customMoveSequence.match(/[KQBNRP]([A-H][1-8]){2}[KQBNRP]?/gi);
+    for (var i = 0; i < movesList.length; i++) {
+        Chess.move(movesList[i]);
+    }
+}
+
+function playSampleGame() {
+    Alert.info('Playing sample game.');
+    resetBoard();
+    for (var i = 0; i < Chess.SAMPLE_GAME.length; i++) {
+        Chess.move(Chess.SAMPLE_GAME[i]);
     }
 }
 

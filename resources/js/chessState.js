@@ -80,6 +80,20 @@ ChessState.prototype.move = function (move) {
     this.board[move[4]][move[3]] = sourcePiece;
     this.board[move[2]][move[1]] = 0;
 
+    // Check for castling (i.e. if the king moves more than 1 file)
+    if (isType('K', sourcePiece) && Math.abs(Chess.FILES[move[1]] - Chess.FILES[move[3]]) > 1) {
+        switch (move[3] + move[4]) {
+        // White king-side
+        case 'G1': return new MoveDefinition.Castle('E1', 'G1', 'H1', 'F1');
+        // White queen-side
+        case 'C1': return new MoveDefinition.Castle('E1', 'C1', 'A1', 'D1');
+        // Black king-side
+        case 'G8': return new MoveDefinition.Castle('E8', 'G8', 'H8', 'F8');
+        // Black queen-side
+        case 'C8': return new MoveDefinition.Castle('E8', 'C8', 'A8', 'D8');
+        }
+    }
+
     if (destPiece) {
         return new MoveDefinition.Capture(move[1] + move[2], move[3] + move[4]);
     } else {
@@ -107,12 +121,16 @@ MoveDefinition.EnPassant = function (start, end, remove) {
     this.remove = remove;
 };
 
-MoveDefinition.Castle = function (start, kingEnd, rookStart, rookEnd) {
-    this.start = start;
+MoveDefinition.Castle = function (kingStart, kingEnd, rookStart, rookEnd) {
+    this.kingStart = kingStart;
     this.kingEnd = kingEnd;
     this.rookStart = rookStart;
     this.rookEnd = rookEnd;
 };
+
+function isType(key, piece) {
+    return (piece & 7) === Chess.PIECES['w' + key];
+}
 
 // Make available globally
 window.ChessState = ChessState;

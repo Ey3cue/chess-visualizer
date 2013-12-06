@@ -40,7 +40,6 @@ function initLighting() {
     var ambient = new THREE.AmbientLight( 0x101010 );
     _scene.add(ambient);
 
-    //_scene.add(Utils.createPointLight(0, 100, 0));
     var distanceFactor = 300;
     var height = 100;
 
@@ -122,7 +121,6 @@ function clearMove() {
 }
 
 Chess.move = function (move) {
-    console.log(move);
     move = move.toUpperCase();
     var moveDef = _state.move(move);
     var sourceModel = models[move[2]][move[1]];
@@ -130,13 +128,22 @@ Chess.move = function (move) {
 
     models[move[4]][move[3]] = sourceModel;
     models[move[2]][move[1]] = null;
-
+    console.log(moveDef.constructor);
     switch (moveDef.constructor) {
     case MoveDefinition.EnPassant:
         // TODO Tween en passant
         break;
     case MoveDefinition.Castle:
-        // TODO Tween rook and king
+        console.log('CASTLE');
+        chessTweens.addTween({
+            model: sourceModel,
+            position: Utils.cellToXyz(moveDef.kingEnd)
+        });
+        chessTweens.addTween({
+            model: models[moveDef.rookStart[1]][moveDef.rookStart[0]],
+            position: Utils.cellToXyz(moveDef.rookEnd)
+        });
+        chessTweens.startTweens();
         break;
     case MoveDefinition.Capture:
         console.log('Capture');
