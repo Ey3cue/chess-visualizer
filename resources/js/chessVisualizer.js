@@ -53,8 +53,10 @@ function initScene() {
     _chess = new THREE.Object3D();
 
     //board = ChessLoader.get('board');
-    ChessAppearance.initBoard();
-    ChessAppearance.initBoardBase();
+    ChessAppearance.init();
+
+    _board.scale.set(Chess.BOARD_SCALE_FACTOR, Chess.BOARD_SCALE_FACTOR, Chess.BOARD_SCALE_FACTOR);
+    _board.position.set(-7 * Chess.BOARD_SCALE_FACTOR, -20, 7 * Chess.BOARD_SCALE_FACTOR);
 
     Chess.setSceneWithState(true);
 }

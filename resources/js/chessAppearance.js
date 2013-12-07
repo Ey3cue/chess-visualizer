@@ -2,36 +2,63 @@
 
 var ChessAppearance = {};
 
-ChessAppearance.initBoard = function () {
+var boardSurfaces = {};
+var boardBases = {};
+
+var currentTheme;
+
+ChessAppearance.init = function () {
     _board = new THREE.Object3D();
 
+    boardSurfaces.marble = createBoard('resources/textures/board-1.jpg', 0xA3A3AA);
+    boardBases.marble = createBoardBase('resources/textures/board-1-base.jpg', 0xA3A3AA);
+
+    boardSurfaces.wood = createBoard('resources/textures/board-2.jpg', 0x230E00);
+    boardBases.wood = createBoardBase('resources/textures/board-2-base.jpg', 0x230E00);
+
+    _board.add(boardSurfaces.marble);
+    _board.add(boardBases.marble);
+
+    currentTheme = 'marble';
+
+    _chess.add(_board);
+    _scene.add(_chess);
+};
+
+ChessAppearance.set = function (theme) {
+    theme = theme || _generalParams.theme;
+
+    _board.remove(boardSurfaces[currentTheme]);
+    _board.remove(boardBases[currentTheme]);
+
+    _board.add(boardSurfaces[theme]);
+    _board.add(boardBases[theme]);
+
+    currentTheme = theme;
+};
+
+function createBoard(image, color) {
     var materials = [];
     var boardMaterial = new THREE.MeshPhongMaterial({
-        map: THREE.ImageUtils.loadTexture('resources/textures/board-1.jpg'),
+        map: THREE.ImageUtils.loadTexture(image),
         specular: '#FFFFFF',
         color: '#FFFFFF',
         emissive: '#000000',
         shininess: 100
     });
     for (var i = 0; i < 6; i++) {
-        materials.push(i === 2 ? boardMaterial : new THREE.MeshBasicMaterial({ color: 0xA3A3AA }));
+        materials.push(i === 2 ? boardMaterial : new THREE.MeshBasicMaterial({ color: color }));
     }
     var boardSurface = new THREE.Mesh(new THREE.CubeGeometry(16, 0.1, 16), new THREE.MeshFaceMaterial(materials));
 
     boardSurface.position.set(7, 0.15, -7);
-    _board.add(boardSurface);
 
-    _board.scale.set(Chess.BOARD_SCALE_FACTOR, Chess.BOARD_SCALE_FACTOR, Chess.BOARD_SCALE_FACTOR);
-    _board.position.set(-7 * Chess.BOARD_SCALE_FACTOR, -20, 7 * Chess.BOARD_SCALE_FACTOR);
+    return boardSurface;
+}
 
-    _chess.add(_board);
-    _scene.add(_chess);
-};
-
-ChessAppearance.initBoardBase = function () {
-    // Marble texture outline
+function createBoardBase(image, color) {
     var materials = [];
-    var baseTexture = THREE.ImageUtils.loadTexture('resources/textures/board-1-base.jpg');
+    var baseTexture = THREE.ImageUtils.loadTexture(image);
     for (var i = 0; i < 6; i++) {
         switch (i) {
         case 2:
@@ -53,14 +80,15 @@ ChessAppearance.initBoardBase = function () {
             }));
             break;
         default:
-            materials.push(new THREE.MeshBasicMaterial({ color: 0xA3A3AA }));
+            materials.push(new THREE.MeshBasicMaterial({ color: color }));
         }
     }
     var boardBase = new THREE.Mesh(new THREE.CubeGeometry(20, 0.3, 20), new THREE.MeshFaceMaterial(materials));
 
     boardBase.position.set(7, 0, -7);
-    _board.add(boardBase);
-};
+
+    return boardBase;
+}
 
 
 ChessAppearance.woodOld = function () {

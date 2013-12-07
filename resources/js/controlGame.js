@@ -22,12 +22,15 @@ var currentMovesList;
 
 ControlGame.init = function () {
     _generalParams = {
-        showStats: true
+        showStats: true,
+        theme: 'marble'
     };
 
     var folder;
     folder = _gui.addFolder('General');
     folder.add(_generalParams, 'showStats').onChange(function () { $('#stats').toggle(); });
+    folder.add(_generalParams, 'theme', ['marble', 'wood']).onChange(ChessAppearance.set);
+    folder.open();
 
     _gameParams = {
         viewWhite: Camera.viewWhite,
@@ -61,7 +64,6 @@ ControlGame.init = function () {
     folder.add(_gameParams, 'resetBoard');
     folder.add(_gameParams, 'customMoveSequence');
     folder.add(_gameParams, 'playMoveSequence');
-    folder.open();
 
     folder = _gui.addFolder('Current Game');
     folder.add(_gameParams, 'gameUrl', Object.keys(GAME_URLS));
