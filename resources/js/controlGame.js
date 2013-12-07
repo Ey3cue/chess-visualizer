@@ -23,13 +23,17 @@ var currentMovesList;
 ControlGame.init = function () {
     _generalParams = {
         showStats: true,
-        theme: 'marble'
+        boardTheme: ChessAppearance.themes[0],
+        baseTheme: ChessAppearance.themes[0],
+        background: Object.keys(ChessAppearance.backgrounds)[1]
     };
 
     var folder;
     folder = _gui.addFolder('General');
     folder.add(_generalParams, 'showStats').onChange(function () { $('#stats').toggle(); });
-    folder.add(_generalParams, 'theme', ['marble', 'wood']).onChange(ChessAppearance.set);
+    folder.add(_generalParams, 'boardTheme', ChessAppearance.themes).onChange(ChessAppearance.setBoard);
+    folder.add(_generalParams, 'baseTheme', ChessAppearance.themes).onChange(ChessAppearance.setBase);
+    folder.add(_generalParams, 'background', Object.keys(ChessAppearance.backgrounds)).onChange(ChessAppearance.setBackground);
     folder.open();
 
     _gameParams = {

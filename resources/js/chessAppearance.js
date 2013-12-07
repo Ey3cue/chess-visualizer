@@ -5,7 +5,15 @@ var ChessAppearance = {};
 var boardSurfaces = {};
 var boardBases = {};
 
-var currentTheme;
+var currentBoardTheme;
+var currentBaseTheme;
+
+ChessAppearance.backgrounds = {
+    background1: 'resources/textures/background-1.jpg',
+    background2: 'resources/textures/background-2.jpg'
+};
+
+ChessAppearance.themes = ['marble', 'wood'];
 
 ChessAppearance.init = function () {
     _board = new THREE.Object3D();
@@ -16,25 +24,38 @@ ChessAppearance.init = function () {
     boardSurfaces.wood = createBoard('resources/textures/board-2.jpg', 0x230E00);
     boardBases.wood = createBoardBase('resources/textures/board-2-base.jpg', 0x230E00);
 
-    _board.add(boardSurfaces.marble);
-    _board.add(boardBases.marble);
+    _board.add(boardSurfaces[ChessAppearance.themes[0]]);
+    _board.add(boardBases[ChessAppearance.themes[0]]);
 
-    currentTheme = 'marble';
+    currentBoardTheme = ChessAppearance.themes[0];
+    currentBaseTheme = ChessAppearance.themes[0];
 
     _chess.add(_board);
     _scene.add(_chess);
 };
 
-ChessAppearance.set = function (theme) {
-    theme = theme || _generalParams.theme;
+ChessAppearance.setBoard = function (theme) {
+    theme = theme || _generalParams.boardTheme;
 
-    _board.remove(boardSurfaces[currentTheme]);
-    _board.remove(boardBases[currentTheme]);
-
+    _board.remove(boardSurfaces[currentBoardTheme]);
     _board.add(boardSurfaces[theme]);
+
+    currentBoardTheme = theme;
+};
+
+ChessAppearance.setBase = function (theme) {
+    theme = theme || _generalParams.baseTheme;
+
+    _board.remove(boardBases[currentBaseTheme]);
     _board.add(boardBases[theme]);
 
-    currentTheme = theme;
+    currentBaseTheme = theme;
+};
+
+ChessAppearance.setBackground = function (background) {
+    background = background || _generalParams.background;
+
+    $('canvas').css('background-image', 'url(' + ChessAppearance.backgrounds[background] + ')');
 };
 
 function createBoard(image, color) {
