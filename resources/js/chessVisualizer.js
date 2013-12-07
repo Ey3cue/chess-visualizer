@@ -6,6 +6,7 @@ var Chess = {};
 var models;
 
 var chessTweens;
+var capturedModels;
 
 /**
  * Initializes the board.
@@ -23,6 +24,7 @@ Chess.init = function () {
     };
 
     chessTweens = new TweenQueue();
+    capturedModels = [];
 
     initScene();
     Camera.init();
@@ -62,39 +64,44 @@ function initScene() {
 }
 
 Chess.setSceneWithState = function (isFirstSet) {
+    for (var i = capturedModels.length - 1; i >= 0; i--) {
+        _board.remove(capturedModels[i]);
+    }
+    capturedModels = [];
+
     for (var rank in models) {
         for (var file in models[rank]) {
             var currentModel = models[rank][file];
             if (currentModel) {
                 // Remove any existing pieces
+                models[rank][file] = null;
                 _board.remove(currentModel);
             }
+
             // Place new piece if it exists in the state
             var pieceStr = Chess.PIECES[_state.board[rank][file]];
             var model = ChessLoader.get(pieceStr);
             if (model) {
                 models[rank][file] = model;
                 model.position = Utils.cellToVec3(rank, file);
-                //model.scale = Utils.vec3(0.01);
-                model.scale = Utils.vec3(Chess.PIECE_SCALE_FACTOR[pieceStr]);
+                model.scale = Utils.vec3(0.01);
+                //model.scale = Utils.vec3(Chess.PIECE_SCALE_FACTOR[pieceStr]);
                 model.rotation.y = Chess.PIECE_ROTATIONS[pieceStr];
                 _board.add(model);
-                /*
-                Chess.addTween({
+                chessTweens.addTween({
                     model: model,
                     scale: Utils.vec3(Chess.PIECE_SCALE_FACTOR[pieceStr])
                 });
-                */
             } else if (pieceStr !== 'na') {
                 console.warn('Could not get model for: ' + Chess.PIECES[_state.board[rank][file]]);
             }
         }
     }
-    //Chess.startTweens();
+    chessTweens.startTweens();
 };
 
 Chess.stop = function () {
-    Chess.stopTweens();
+    chessTweens.stopTweens();
 };
 
 function clearMove() {
@@ -123,6 +130,7 @@ Chess.move = function (move) {
             scale: Utils.xyz(0),
             callback: function () { _board.remove(capturedModel); }
         });
+        capturedModels.push(capturedModel);
         chessTweens.startTweens();
         break;
     case MoveDefinition.Castle:
@@ -147,6 +155,7 @@ Chess.move = function (move) {
             scale: Utils.xyz(0),
             callback: function () { _board.remove(destModel); }
         });
+        capturedModels.push(destModel);
         // Fall through
     case MoveDefinition.Normal:
         chessTweens.addTween({

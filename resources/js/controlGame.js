@@ -25,7 +25,12 @@ ControlGame.init = function () {
         showStats: true,
         boardTheme: ChessAppearance.themes[0],
         baseTheme: ChessAppearance.themes[0],
-        background: Object.keys(ChessAppearance.backgrounds)[1]
+        background: Object.keys(ChessAppearance.backgrounds)[1],
+
+        viewWhite: Camera.viewWhite,
+        viewBlack: Camera.viewBlack,
+        viewNuetral: Camera.viewNuetral,
+        viewTopDown: Camera.viewTopDown
     };
 
     var folder;
@@ -36,12 +41,13 @@ ControlGame.init = function () {
     folder.add(_generalParams, 'background', Object.keys(ChessAppearance.backgrounds)).onChange(ChessAppearance.setBackground);
     folder.open();
 
-    _gameParams = {
-        viewWhite: Camera.viewWhite,
-        viewBlack: Camera.viewBlack,
-        viewNuetral: Camera.viewNuetral,
-        viewTopDown: Camera.viewTopDown,
+    folder = _gui.addFolder('Camera Controls');
+    folder.add(_generalParams, 'viewWhite');
+    folder.add(_generalParams, 'viewBlack');
+    folder.add(_generalParams, 'viewNuetral');
+    folder.add(_generalParams, 'viewTopDown');
 
+    _gameParams = {
         resetBoard: resetBoard,
         //customMoveSequence: 'Pe2e4,Bf1d3,Kg1f3,Ke1g1', // Castle check
         customMoveSequence: 'Pe2e4,Pf7f4,Pe4f5', // En passant check
@@ -50,19 +56,12 @@ ControlGame.init = function () {
         gameUrl: '10.11.18.65',
         //gameUrl: 'bencarle',
         gameId: '340',
-        //gameId: '52',
         showGame: startGame,
         stopGame: stopGame,
         pollingInterval: 2,
         playFromBeginning: resetGame,
         waitBetweenMoves: 0.1
     };
-
-    folder = _gui.addFolder('Camera Controls');
-    folder.add(_gameParams, 'viewWhite');
-    folder.add(_gameParams, 'viewBlack');
-    folder.add(_gameParams, 'viewNuetral');
-    folder.add(_gameParams, 'viewTopDown');
 
     folder = _gui.addFolder('Custom Game');
     folder.add(_gameParams, 'resetBoard');
@@ -164,6 +163,7 @@ function stopGame(noErrorMessage) {
 function resetGame() {
     if (gameTimeout) {
         Alert.info('Playing game ' + currentGameId + ' from the beginning.');
+        Chess.stop();
         _state.reset();
         Chess.setSceneWithState();
         for (var i = 0; i < currentMovesList.length; i++) {

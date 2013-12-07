@@ -74,7 +74,7 @@ TweenQueue.prototype.updateTweens = function () {
             for (var i = self.currentTweenOptionsList.length - 1; i >= 0; i--) {
                 startTweenSet(self, self.currentTweenOptionsList[i]);
             }
-        }, 0);
+        }, 50);
     }
 };
 
