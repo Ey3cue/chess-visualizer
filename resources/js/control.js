@@ -4,6 +4,9 @@ var _renderer;
 var _camera;
 var _scene;
 
+var _chess;
+var _board;
+
 var _gui;
 var _stats;
 

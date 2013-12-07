@@ -4,8 +4,6 @@
 var Chess = {};
 
 var models;
-var chess;
-var board;
 
 var chessTweens;
 
@@ -52,29 +50,11 @@ function initLighting() {
 function initScene() {
     _scene = new THREE.Scene();
 
-    chess = new THREE.Object3D();
+    _chess = new THREE.Object3D();
 
-    board = ChessLoader.get('board');
-    board.scale.set(Chess.BOARD_SCALE_FACTOR, Chess.BOARD_SCALE_FACTOR, Chess.BOARD_SCALE_FACTOR);
-    board.position.set(-7 * Chess.BOARD_SCALE_FACTOR, -20, 7 * Chess.BOARD_SCALE_FACTOR);
-    chess.add(board);
-    _scene.add(chess);
-
-    // Wood texture outline
-    var texture = THREE.ImageUtils.loadTexture('resources/textures/wood-1.png');
-    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-    texture.repeat.set(4, 4);
-    texture.anisotropy = _renderer.getMaxAnisotropy();
-    var material = new THREE.MeshPhongMaterial({
-        map: texture,
-        specular: '#FFFFFF',
-        color:'#555555',
-        emissive:'#FFFFFF',
-        shininess: 100
-    });
-    var base = new THREE.Mesh(new THREE.CubeGeometry(19, 0.35, 19), material);
-    base.position.set(7, -0.5, -7);
-    board.add(base);
+    //board = ChessLoader.get('board');
+    ChessAppearance.initBoard();
+    ChessAppearance.initBoardBase();
 
     Chess.setSceneWithState(true);
 }
@@ -85,7 +65,7 @@ Chess.setSceneWithState = function (isFirstSet) {
             var currentModel = models[rank][file];
             if (currentModel) {
                 // Remove any existing pieces
-                board.remove(currentModel);
+                _board.remove(currentModel);
             }
             // Place new piece if it exists in the state
             var pieceStr = Chess.PIECES[_state.board[rank][file]];
@@ -96,7 +76,7 @@ Chess.setSceneWithState = function (isFirstSet) {
                 //model.scale = Utils.vec3(0.01);
                 model.scale = Utils.vec3(Chess.PIECE_SCALE_FACTOR[pieceStr]);
                 model.rotation.y = Chess.PIECE_ROTATIONS[pieceStr];
-                board.add(model);
+                _board.add(model);
                 /*
                 Chess.addTween({
                     model: model,
@@ -139,7 +119,7 @@ Chess.move = function (move) {
         chessTweens.addTween({
             model: capturedModel,
             scale: Utils.xyz(0),
-            callback: function () { board.remove(capturedModel); }
+            callback: function () { _board.remove(capturedModel); }
         });
         chessTweens.startTweens();
         break;
@@ -163,7 +143,7 @@ Chess.move = function (move) {
         chessTweens.addTween({
             model: destModel,
             scale: Utils.xyz(0),
-            callback: function () { board.remove(destModel); }
+            callback: function () { _board.remove(destModel); }
         });
         // Fall through
     case MoveDefinition.Normal:
@@ -188,7 +168,7 @@ Chess.move = function (move) {
             model: sourceModel,
             scale: Utils.xyz(0.01),
             delay: 0,
-            callback: function () { board.remove(sourceModel); }
+            callback: function () { _board.remove(sourceModel); }
         });
         chessTweens.addTween({
             model: newModel,
